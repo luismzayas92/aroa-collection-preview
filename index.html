@@ -48,6 +48,8 @@
   ::selection{ background: var(--ink); color: var(--paper); }
   @media (prefers-reduced-motion: reduce){
     *{ animation: none !important; transition: none !important; }
+    .hero-tagline, .hero-sub, .reveal{ opacity: 1 !important; transform: none !important; }
+    .texture-frame{ clip-path: inset(0 0 0 0) !important; }
   }
 
   .wrap{ max-width: 1180px; margin: 0 auto; padding: 0 clamp(1.25rem, 4vw, 3rem); }
@@ -78,37 +80,52 @@
 
   /* ---------- HERO ---------- */
   .hero{
-    min-height: 92vh;
+    min-height: 100vh;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center;
-    padding: 4rem 1.5rem 3rem;
+    padding: 5rem 1.5rem 2.5rem;
+    position: relative;
+  }
+  .hero-mark-wrap{
+    width: min(78vw, 560px);
+    will-change: transform;
   }
   .hero-mark{
-    width: min(58vw, 340px);
+    width: 100%;
+    display: block;
     color: var(--ink);
+    filter: drop-shadow(0 0 0 transparent);
   }
   .hero-mark path{ fill: currentColor; }
-  .mark-a{ transform-origin: 315px 496px; animation: settleA 1.15s cubic-bezier(.16,.9,.2,1) both; }
-  .mark-b{ transform-origin: 649px 597px; animation: settleB 1.15s cubic-bezier(.16,.9,.2,1) both; }
+  .mark-a{ transform-origin: 315px 496px; animation: settleA 1.4s cubic-bezier(.16,.9,.2,1) both; }
+  .mark-b{ transform-origin: 649px 597px; animation: settleB 1.4s cubic-bezier(.16,.9,.2,1) both; }
   @keyframes settleA{
-    0%{ transform: translate(-26px,-10px) rotate(-6deg); opacity: 0; }
+    0%{ transform: translate(-40px,-16px) rotate(-8deg); opacity: 0; }
     100%{ transform: translate(0,0) rotate(0); opacity: 1; }
   }
   @keyframes settleB{
-    0%{ transform: translate(26px,14px) rotate(6deg); opacity: 0; }
+    0%{ transform: translate(40px,22px) rotate(8deg); opacity: 0; }
     100%{ transform: translate(0,0) rotate(0); opacity: 1; }
   }
   .hero-tagline{
     font-family: var(--font-display);
     font-style: italic;
-    font-size: clamp(1.3rem, 3vw, 1.9rem);
-    margin: 1.8rem 0 .7rem;
+    font-size: clamp(1.05rem, 2vw, 1.35rem);
+    margin: 2.4rem 0 .5rem;
     text-wrap: balance;
+    opacity: 0;
+    animation: fadeUp .9s ease .9s both;
   }
   .hero-sub{
-    font-size: .74rem; text-transform: uppercase; letter-spacing: .28em;
+    font-size: .68rem; text-transform: uppercase; letter-spacing: .26em;
     color: var(--ink-faint);
-    margin: 0 0 2.6rem;
+    margin: 0 0 3rem;
+    opacity: 0;
+    animation: fadeUp .9s ease 1.05s both;
+  }
+  @keyframes fadeUp{
+    0%{ opacity: 0; transform: translateY(10px); }
+    100%{ opacity: 1; transform: translateY(0); }
   }
   .scroll-cue{
     width: 1px; height: 46px; background: var(--line);
@@ -177,6 +194,38 @@
     color: var(--ink-faint);
   }
 
+  /* ---------- REVEAL ---------- */
+  .reveal{ opacity: 0; transform: translateY(22px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.visible{ opacity: 1; transform: translateY(0); }
+  .reveal.d1{ transition-delay: .08s; }
+  .reveal.d2{ transition-delay: .16s; }
+  .reveal.d3{ transition-delay: .24s; }
+
+  /* ---------- MATERIALIDAD ---------- */
+  .materialidad-grid{
+    display: grid; grid-template-columns: 1fr 1fr; gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+  }
+  .materialidad-text p{
+    color: var(--ink-soft); font-size: .98rem; line-height: 1.7; max-width: 42ch;
+  }
+  .texture-frame{
+    aspect-ratio: 4 / 5; border: 1px solid var(--line);
+    overflow: hidden; position: relative;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 1.3s cubic-bezier(.16,.9,.2,1);
+  }
+  .texture-frame.visible{ clip-path: inset(0 0 0 0); }
+  .texture-frame canvas{ display: block; width: 100%; height: 100%; }
+  .texture-caption{
+    margin-top: 1rem; font-size: .7rem; color: var(--ink-faint);
+    letter-spacing: .04em;
+  }
+  @media (max-width: 760px){
+    .materialidad-grid{ grid-template-columns: 1fr; }
+    .texture-frame{ order: -1; aspect-ratio: 16/10; }
+  }
+
   /* ---------- ISOTIPO SHOWCASE (inverted) ---------- */
   .showcase{
     background: var(--ink); color: var(--paper);
@@ -206,28 +255,77 @@
     color: rgba(255,255,255,.36);
   }
 
+  /* ---------- BRAND BOOK ---------- */
+  .brandbook-row{
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    background: rgba(255,255,255,.14);
+    margin: 2.6rem 0 0;
+  }
+  .swatch{
+    aspect-ratio: 1.4/1;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .swatch-white{ background: #FFFFFF; }
+  .swatch-black{ background: #000000; }
+  .swatch svg{ width: 34%; }
+  .swatch-white svg path{ fill: #000000; }
+  .swatch-black svg path{ fill: #FFFFFF; }
+  .swatch-tag{
+    position: absolute; bottom: .9rem; left: .9rem;
+    font-size: .64rem; letter-spacing: .1em; text-transform: uppercase;
+  }
+  .swatch-white .swatch-tag{ color: rgba(0,0,0,.4); }
+  .swatch-black .swatch-tag{ color: rgba(255,255,255,.4); }
+
+  .clearspace-demo{
+    margin-top: 1px;
+    background: rgba(255,255,255,.14);
+    padding: clamp(2.4rem, 6vw, 4rem) 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .clearspace-box{
+    position: relative;
+    border: 1px dashed rgba(255,255,255,.32);
+    padding: 15%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .clearspace-box svg{ width: 90px; }
+  .clearspace-box svg path{ fill: #FFFFFF; }
+  .clearspace-x{
+    position: absolute; top: 50%; left: -1.8rem; transform: translateY(-50%) rotate(-90deg);
+    font-size: .62rem; letter-spacing: .1em; color: rgba(255,255,255,.4);
+  }
+
   /* ---------- SPEC STRIP ---------- */
   .spec-grid{
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid rgba(255,255,255,.14);
+    margin-top: 2.6rem;
   }
   .spec{
-    padding: 1.6rem 1.5rem 1.6rem 0; border-right: 1px solid var(--line);
+    padding: 1.6rem 1.5rem 0 0; border-right: 1px solid rgba(255,255,255,.14);
   }
   .spec:last-child{ border-right: none; }
-  .spec .eyebrow{ margin-bottom: .5rem; }
+  .spec .eyebrow{ margin-bottom: .5rem; color: rgba(255,255,255,.42); }
   .spec strong{ display: block; font-size: 1rem; }
-  .spec span{ font-size: .8rem; color: var(--ink-faint); }
+  .spec span{ font-size: .8rem; color: rgba(255,255,255,.42); }
   @media (max-width: 760px){
     .spec-grid{ grid-template-columns: 1fr 1fr; }
     .spec:nth-child(2n){ border-right: none; }
-    .spec{ border-bottom: 1px solid var(--line); padding-bottom: 1.4rem; margin-bottom: .2rem; }
+    .spec{ border-bottom: 1px solid rgba(255,255,255,.14); padding-bottom: 1.4rem; margin-bottom: .2rem; }
+    .brandbook-row{ grid-template-columns: 1fr; }
   }
 
   /* ---------- WAITLIST ---------- */
   .waitlist{ text-align: center; }
+  .waitlist-statement{
+    font-family: var(--font-display); font-style: italic;
+    font-size: clamp(1.4rem, 3.6vw, 2.1rem); line-height: 1.35;
+    max-width: 26ch; margin: 0 auto 2.6rem; text-wrap: balance;
+  }
   .waitlist h2{ margin: 0 auto .8rem; }
-  .waitlist p{ max-width: 46ch; margin: 0 auto 2.4rem; color: var(--ink-soft); }
+  .waitlist p.lede{ max-width: 46ch; margin: 0 auto 2.4rem; color: var(--ink-soft); }
   form{
     display: flex; max-width: 420px; margin: 0 auto;
     border-bottom: 1px solid var(--ink);
@@ -239,12 +337,19 @@
   }
   form input::placeholder{ color: var(--ink-faint); }
   form button{
+    position: relative;
     border: none; background: transparent; color: var(--ink);
     font-family: var(--font-body); font-size: .74rem; text-transform: uppercase;
-    letter-spacing: .12em; padding: .8rem .2rem; cursor: pointer;
-    transition: opacity .2s ease;
+    letter-spacing: .12em; padding: .8rem 1rem; cursor: pointer;
+    overflow: hidden; z-index: 0;
   }
-  form button:hover{ opacity: .55; }
+  form button::before{
+    content: ""; position: absolute; inset: 0; background: var(--ink);
+    transform: scaleX(0); transform-origin: left; z-index: -1;
+    transition: transform .32s cubic-bezier(.65,0,.35,1);
+  }
+  form button:hover{ color: var(--paper); }
+  form button:hover::before{ transform: scaleX(1); }
   form:focus-within{ border-bottom-color: var(--ink); }
   .waitlist-handle{
     margin-top: 1.6rem; font-size: .8rem; color: var(--ink-faint);
@@ -278,10 +383,12 @@
 </nav>
 
 <header class="hero">
-  <svg class="hero-mark" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
-    <path class="mark-a" d="M315 82C286 82 266 101 258 130L155 470C140 520 143 575 158 630L238 910C246 938 276 945 291 918L425 676C446 638 453 610 429 584C416 570 392 560 373 544C337 514 326 476 349 433L535 164C555 135 545 108 518 98L336 82C329 81 322 81 315 82Z"/>
-    <path class="mark-b" d="M596 331C572 330 557 340 546 360L454 519C434 553 440 579 470 599C485 609 509 617 527 633C555 658 562 686 543 721L493 808C480 832 492 855 516 863L738 930C765 938 789 921 793 894L844 525C848 497 839 474 819 457L661 345C642 333 618 330 596 331Z"/>
-  </svg>
+  <div class="hero-mark-wrap" id="heroMarkWrap">
+    <svg class="hero-mark" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+      <path class="mark-a" d="M315 82C286 82 266 101 258 130L155 470C140 520 143 575 158 630L238 910C246 938 276 945 291 918L425 676C446 638 453 610 429 584C416 570 392 560 373 544C337 514 326 476 349 433L535 164C555 135 545 108 518 98L336 82C329 81 322 81 315 82Z"/>
+      <path class="mark-b" d="M596 331C572 330 557 340 546 360L454 519C434 553 440 579 470 599C485 609 509 617 527 633C555 658 562 686 543 721L493 808C480 832 492 855 516 863L738 930C765 938 789 921 793 894L844 525C848 497 839 474 819 457L661 345C642 333 618 330 596 331Z"/>
+    </svg>
+  </div>
   <p class="hero-tagline">Control tensionado.</p>
   <p class="hero-sub">Minimal luxury activewear</p>
   <div class="scroll-cue" aria-hidden="true"></div>
@@ -289,11 +396,11 @@
 
 <section id="filosofia">
   <div class="wrap">
-    <p class="eyebrow">La idea</p>
-    <h2>Una fuerza controlada</h2>
-    <p class="manifesto-lede">Soporte sin rigidez, fuerza sin agresión, escultura sin anatomía y lujo sin fragilidad. El símbolo de Aroa nace de dos masas desiguales en tensión — no de un cuerpo, sino de la sensación de sostenerlo.</p>
+    <p class="eyebrow reveal">La idea</p>
+    <h2 class="reveal">Una fuerza controlada</h2>
+    <p class="manifesto-lede reveal">Soporte sin rigidez, fuerza sin agresión, escultura sin anatomía y lujo sin fragilidad. El símbolo de Aroa nace de dos masas desiguales en tensión — no de un cuerpo, sino de la sensación de sostenerlo.</p>
 
-    <div class="pillars">
+    <div class="pillars reveal">
       <div class="pillar">
         <span class="num">01</span>
         <h3>Dos masas</h3>
@@ -311,25 +418,60 @@
       </div>
     </div>
 
-    <div class="quote-block">
+    <div class="quote-block reveal">
       <p>"El símbolo no representa ejercicio. Representa la sensación de un cuerpo sostenido, seguro y en control."</p>
       <cite>Aroa Collection — símbolo maestro</cite>
     </div>
   </div>
 </section>
 
+<section id="materialidad">
+  <div class="wrap">
+    <p class="eyebrow reveal">Materialidad</p>
+    <h2 class="reveal">Se percibe antes de tocarse</h2>
+    <div class="materialidad-grid">
+      <div class="materialidad-text reveal d1">
+        <p>El concepto todavía no tiene tejido, costura ni bordado definitivos — pero la dirección ya está trazada: la misma tensión controlada del símbolo, resuelta en materiales reales cuando llegue la primera muestra física.</p>
+      </div>
+      <div>
+        <div class="texture-frame" id="textureFrame">
+          <canvas id="textureCanvas" aria-hidden="true"></canvas>
+        </div>
+        <p class="texture-caption">Dirección de costura — referencia de tensión de hilo, no fotografía de producto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section id="identidad" class="showcase">
   <div class="wrap">
-    <p class="eyebrow">Identidad</p>
+    <p class="eyebrow reveal">Identidad</p>
     <svg class="showcase-mark" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
       <path d="M315 82C286 82 266 101 258 130L155 470C140 520 143 575 158 630L238 910C246 938 276 945 291 918L425 676C446 638 453 610 429 584C416 570 392 560 373 544C337 514 326 476 349 433L535 164C555 135 545 108 518 98L336 82C329 81 322 81 315 82Z"/>
       <path d="M596 331C572 330 557 340 546 360L454 519C434 553 440 579 470 599C485 609 509 617 527 633C555 658 562 686 543 721L493 808C480 832 492 855 516 863L738 930C765 938 789 921 793 894L844 525C848 497 839 474 819 457L661 345C642 333 618 330 596 331Z"/>
     </svg>
     <p class="showcase-caption">Una tinta. Sin efectos. El isotipo funciona igual de sólido en negro sobre blanco que en blanco sobre negro — sin degradados, sombras ni variantes de color.</p>
     <p class="showcase-status">Aprobado visualmente · pendiente lectura humana, muestra física de bordado y búsqueda de marca</p>
-  </div>
-  <div class="wrap">
-    <div class="spec-grid">
+
+    <div class="brandbook-row reveal">
+      <div class="swatch swatch-white">
+        <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path d="M315 82C286 82 266 101 258 130L155 470C140 520 143 575 158 630L238 910C246 938 276 945 291 918L425 676C446 638 453 610 429 584C416 570 392 560 373 544C337 514 326 476 349 433L535 164C555 135 545 108 518 98L336 82C329 81 322 81 315 82Z"/><path d="M596 331C572 330 557 340 546 360L454 519C434 553 440 579 470 599C485 609 509 617 527 633C555 658 562 686 543 721L493 808C480 832 492 855 516 863L738 930C765 938 789 921 793 894L844 525C848 497 839 474 819 457L661 345C642 333 618 330 596 331Z"/></svg>
+        <span class="swatch-tag">Sobre blanco</span>
+      </div>
+      <div class="swatch swatch-black">
+        <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path d="M315 82C286 82 266 101 258 130L155 470C140 520 143 575 158 630L238 910C246 938 276 945 291 918L425 676C446 638 453 610 429 584C416 570 392 560 373 544C337 514 326 476 349 433L535 164C555 135 545 108 518 98L336 82C329 81 322 81 315 82Z"/><path d="M596 331C572 330 557 340 546 360L454 519C434 553 440 579 470 599C485 609 509 617 527 633C555 658 562 686 543 721L493 808C480 832 492 855 516 863L738 930C765 938 789 921 793 894L844 525C848 497 839 474 819 457L661 345C642 333 618 330 596 331Z"/></svg>
+        <span class="swatch-tag">Sobre negro</span>
+      </div>
+    </div>
+
+    <div class="clearspace-demo reveal">
+      <div class="clearspace-box">
+        <span class="clearspace-x">X</span>
+        <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg"><path d="M315 82C286 82 266 101 258 130L155 470C140 520 143 575 158 630L238 910C246 938 276 945 291 918L425 676C446 638 453 610 429 584C416 570 392 560 373 544C337 514 326 476 349 433L535 164C555 135 545 108 518 98L336 82C329 81 322 81 315 82Z"/><path d="M596 331C572 330 557 340 546 360L454 519C434 553 440 579 470 599C485 609 509 617 527 633C555 658 562 686 543 721L493 808C480 832 492 855 516 863L738 930C765 938 789 921 793 894L844 525C848 497 839 474 819 457L661 345C642 333 618 330 596 331Z"/></svg>
+      </div>
+    </div>
+
+    <div class="spec-grid reveal">
       <div class="spec">
         <p class="eyebrow">Color</p>
         <strong>#000000</strong>
@@ -356,14 +498,15 @@
 
 <section id="acceso" class="waitlist">
   <div class="wrap">
-    <p class="eyebrow">Próximamente</p>
-    <h2>Acceso anticipado</h2>
-    <p>La colección todavía se está terminando. Deja tu correo y serás de las primeras en verla.</p>
-    <form onsubmit="event.preventDefault()">
+    <p class="waitlist-statement reveal">No estamos lanzando ropa. Estamos construyendo una nueva forma de sentirla.</p>
+    <p class="eyebrow reveal">Próximamente</p>
+    <h2 class="reveal">Acceso anticipado</h2>
+    <p class="lede reveal">La colección todavía se está terminando. Deja tu correo y serás de las primeras en verla.</p>
+    <form class="reveal" onsubmit="event.preventDefault()">
       <input type="email" placeholder="tu@correo.com" required>
       <button type="submit">Unirme</button>
     </form>
-    <p class="waitlist-handle">@aroacollectionshop</p>
+    <p class="waitlist-handle reveal">@aroacollectionshop</p>
   </div>
 </section>
 
@@ -374,3 +517,112 @@
   </div>
   <p class="foot-note">Identidad y desarrollo — Percepta Concept</p>
 </footer>
+
+<script>
+(function(){
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- scroll reveal ---- */
+  var revealEls = document.querySelectorAll('.reveal');
+  if (reduceMotion || !('IntersectionObserver' in window)){
+    revealEls.forEach(function(el){ el.classList.add('visible'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting){
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: .18, rootMargin: '0px 0px -6% 0px' });
+    revealEls.forEach(function(el){ io.observe(el); });
+  }
+
+  var frame = document.getElementById('textureFrame');
+  if (frame){
+    if (reduceMotion || !('IntersectionObserver' in window)){
+      frame.classList.add('visible');
+    } else {
+      var fio = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){
+          if (entry.isIntersecting){ entry.target.classList.add('visible'); fio.unobserve(entry.target); }
+        });
+      }, { threshold: .3 });
+      fio.observe(frame);
+    }
+  }
+
+  /* ---- hero parallax ---- */
+  var markWrap = document.getElementById('heroMarkWrap');
+  if (markWrap && !reduceMotion){
+    var ticking = false;
+    window.addEventListener('scroll', function(){
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function(){
+        var y = window.scrollY || 0;
+        var t = Math.min(y, 600);
+        markWrap.style.transform = 'translateY(' + (t * 0.14) + 'px) scale(' + (1 - t * 0.00016) + ')';
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
+  /* ---- texture canvas: stitch / thread-tension pattern, one ink only ---- */
+  var canvas = document.getElementById('textureCanvas');
+  if (canvas && canvas.getContext){
+    var ctx = canvas.getContext('2d');
+
+    function inkColor(){
+      return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000000';
+    }
+
+    function draw(){
+      var rect = canvas.getBoundingClientRect();
+      var dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var w = rect.width, h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+
+      var ink = inkColor();
+      var rows = 26;
+      var rowH = h / rows;
+      for (var r = 0; r < rows; r++){
+        var y = r * rowH + rowH / 2;
+        var density = 0.35 + 0.5 * Math.abs(Math.sin(r / rows * Math.PI));
+        var dash = 5 + 4 * Math.sin(r * 0.7);
+        ctx.strokeStyle = ink;
+        ctx.globalAlpha = 0.1 + density * 0.16;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (var x = -20; x < w + 20; x += dash * 2.4){
+          ctx.moveTo(x, y - dash * 0.4);
+          ctx.lineTo(x + dash, y + dash * 0.4);
+        }
+        ctx.stroke();
+      }
+
+      /* single seam line under tension, tying to the isotipo's two-mass concept */
+      ctx.globalAlpha = 0.85;
+      ctx.strokeStyle = ink;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.18, h * 0.08);
+      ctx.bezierCurveTo(w * 0.05, h * 0.4, w * 0.42, h * 0.42, w * 0.34, h * 0.62);
+      ctx.bezierCurveTo(w * 0.28, h * 0.78, w * 0.55, h * 0.86, w * 0.7, h * 0.95);
+      ctx.stroke();
+
+      ctx.globalAlpha = 1;
+    }
+
+    draw();
+    window.addEventListener('resize', draw);
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', draw);
+    var themeObserver = new MutationObserver(draw);
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+})();
+</script>
