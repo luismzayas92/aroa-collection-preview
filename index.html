@@ -607,38 +607,9 @@
       return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000000';
     }
 
-    /* normalized silhouette path (0..1), slightly asymmetric — echoes the isotipo's tension */
-    function silhouettePath(ctx, ox, oy, s){
-      var P = function(x, y){ return [ox + x * s, oy + y * s]; };
-      ctx.beginPath();
-      var p;
-      p = P(0.42, 0.0); ctx.moveTo(p[0], p[1]);
-      ctx.bezierCurveTo.apply(ctx, P(0.36,0.01).concat(P(0.34,0.03)).concat(P(0.34,0.045)));
-      ctx.bezierCurveTo.apply(ctx, P(0.2,0.06).concat(P(0.1,0.08)).concat(P(0.06,0.14)));
-      ctx.bezierCurveTo.apply(ctx, P(0.02,0.22).concat(P(0.03,0.32)).concat(P(0.07,0.4)));
-      ctx.bezierCurveTo.apply(ctx, P(0.09,0.44).concat(P(0.12,0.46)).concat(P(0.15,0.44)));
-      ctx.bezierCurveTo.apply(ctx, P(0.18,0.4).concat(P(0.2,0.32)).concat(P(0.24,0.27)));
-      ctx.bezierCurveTo.apply(ctx, P(0.22,0.34).concat(P(0.21,0.42)).concat(P(0.24,0.5)));
-      ctx.bezierCurveTo.apply(ctx, P(0.27,0.58).concat(P(0.32,0.62)).concat(P(0.3,0.7)));
-      ctx.bezierCurveTo.apply(ctx, P(0.28,0.8).concat(P(0.27,0.9)).concat(P(0.26,1.0)));
-      p = P(0.42, 1.0); ctx.lineTo(p[0], p[1]);
-      ctx.bezierCurveTo.apply(ctx, P(0.41,0.88).concat(P(0.41,0.78)).concat(P(0.44,0.7)));
-      ctx.bezierCurveTo.apply(ctx, P(0.46,0.64).concat(P(0.46,0.6)).concat(P(0.44,0.55)));
-      p = P(0.5, 0.52); ctx.lineTo(p[0], p[1]);
-      ctx.bezierCurveTo.apply(ctx, P(0.54,0.6).concat(P(0.54,0.64)).concat(P(0.56,0.7)));
-      ctx.bezierCurveTo.apply(ctx, P(0.59,0.78).concat(P(0.59,0.88)).concat(P(0.58,1.0)));
-      p = P(0.74, 1.0); ctx.lineTo(p[0], p[1]);
-      ctx.bezierCurveTo.apply(ctx, P(0.73,0.9).concat(P(0.72,0.8)).concat(P(0.7,0.7)));
-      ctx.bezierCurveTo.apply(ctx, P(0.68,0.62).concat(P(0.73,0.58)).concat(P(0.76,0.5)));
-      ctx.bezierCurveTo.apply(ctx, P(0.79,0.42).concat(P(0.78,0.34)).concat(P(0.76,0.27)));
-      ctx.bezierCurveTo.apply(ctx, P(0.8,0.32).concat(P(0.82,0.4)).concat(P(0.85,0.44)));
-      ctx.bezierCurveTo.apply(ctx, P(0.88,0.46).concat(P(0.91,0.44)).concat(P(0.93,0.4)));
-      ctx.bezierCurveTo.apply(ctx, P(0.97,0.32).concat(P(0.98,0.22)).concat(P(0.94,0.14)));
-      ctx.bezierCurveTo.apply(ctx, P(0.9,0.08).concat(P(0.8,0.06)).concat(P(0.66,0.045)));
-      ctx.bezierCurveTo.apply(ctx, P(0.66,0.03).concat(P(0.64,0.01)).concat(P(0.58,0.0)));
-      ctx.bezierCurveTo.apply(ctx, P(0.53,0.015).concat(P(0.47,0.015)).concat(P(0.42,0.0)));
-      ctx.closePath();
-    }
+    /* the real, approved isotipo paths — scaled dramatically, treated with implied lateral light */
+    var MARK_A = new Path2D("M315 82C286 82 266 101 258 130L155 470C140 520 143 575 158 630L238 910C246 938 276 945 291 918L425 676C446 638 453 610 429 584C416 570 392 560 373 544C337 514 326 476 349 433L535 164C555 135 545 108 518 98L336 82C329 81 322 81 315 82Z");
+    var MARK_B = new Path2D("M596 331C572 330 557 340 546 360L454 519C434 553 440 579 470 599C485 609 509 617 527 633C555 658 562 686 543 721L493 808C480 832 492 855 516 863L738 930C765 938 789 921 793 894L844 525C848 497 839 474 819 457L661 345C642 333 618 330 596 331Z");
 
     function drawGarment(){
       var rect = gcanvas.getBoundingClientRect();
@@ -649,23 +620,29 @@
       var w = rect.width, h = rect.height;
       gctx.clearRect(0, 0, w, h);
 
-      var gh = h * 0.78;
-      var gw = gh * 0.62;
-      var ox = w / 2 - gw / 2;
-      var oy = h * 0.11;
+      var s = Math.min(h * 0.82, w * 0.78) / 1000;
+      var ox = w / 2 - (1000 * s) / 2;
+      var oy = h / 2 - (1000 * s) / 2;
 
       gctx.save();
-      silhouettePath(gctx, ox, oy, gw);
-      gctx.clip();
-      gctx.fillStyle = inkColorG();
-      gctx.fillRect(ox - 4, oy - 4, gw + 8, gh + 8);
+      gctx.translate(ox, oy);
+      gctx.scale(s, s);
 
-      /* implied lateral light — confined to the silhouette via clip, monochrome only */
-      var grad = gctx.createLinearGradient(ox, 0, ox + gw * 0.55, 0);
-      grad.addColorStop(0, hexToRgba(paperColor(), 0.16));
+      var full = new Path2D();
+      full.addPath(MARK_A);
+      full.addPath(MARK_B);
+      gctx.save();
+      gctx.clip(full);
+      gctx.fillStyle = inkColorG();
+      gctx.fillRect(-40, -40, 1080, 1080);
+
+      /* implied lateral light — confined to the mark via clip, monochrome only */
+      var grad = gctx.createLinearGradient(0, 0, 620, 0);
+      grad.addColorStop(0, hexToRgba(paperColor(), 0.22));
       grad.addColorStop(1, hexToRgba(paperColor(), 0));
       gctx.fillStyle = grad;
-      gctx.fillRect(ox - 4, oy - 4, gw + 8, gh + 8);
+      gctx.fillRect(-40, -40, 1080, 1080);
+      gctx.restore();
       gctx.restore();
     }
 
