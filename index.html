@@ -146,6 +146,23 @@
     100%{ opacity: 1; transform: translateY(0); }
   }
 
+  /* ---------- HERO MOMENT — the one memorable image ---------- */
+  .garment-moment{
+    height: min(100vh, 980px);
+    display: flex; align-items: center; justify-content: center;
+    border-top: 1px solid var(--line);
+    opacity: 0; transform: scale(1.03);
+    animation: garmentIn 1.4s cubic-bezier(.16,.9,.2,1) .1s forwards;
+  }
+  .garment-moment canvas{
+    height: 100%; width: 100%;
+    display: block;
+  }
+  @keyframes garmentIn{
+    0%{ opacity: 0; transform: scale(1.03); }
+    100%{ opacity: 1; transform: scale(1); }
+  }
+
   /* ---------- SECTION SHELL ---------- */
   section{ padding: clamp(4rem, 9vw, 7rem) 0; border-top: 1px solid var(--line); }
   .eyebrow{
@@ -405,6 +422,10 @@
   <p class="hero-sub">Minimal luxury activewear</p>
 </div>
 
+<div class="garment-moment">
+  <canvas id="garmentCanvas" aria-hidden="true"></canvas>
+</div>
+
 <section id="filosofia">
   <div class="wrap">
     <p class="eyebrow reveal">La idea</p>
@@ -572,6 +593,95 @@
         ticking = false;
       });
     }, { passive: true });
+  }
+
+  /* ---- garment silhouette: the one memorable image, conceptual not photographic ---- */
+  var gcanvas = document.getElementById('garmentCanvas');
+  if (gcanvas && gcanvas.getContext){
+    var gctx = gcanvas.getContext('2d');
+
+    function paperColor(){
+      return getComputedStyle(document.documentElement).getPropertyValue('--paper').trim() || '#FFFFFF';
+    }
+    function inkColorG(){
+      return getComputedStyle(document.documentElement).getPropertyValue('--ink').trim() || '#000000';
+    }
+
+    /* normalized silhouette path (0..1), slightly asymmetric — echoes the isotipo's tension */
+    function silhouettePath(ctx, ox, oy, s){
+      var P = function(x, y){ return [ox + x * s, oy + y * s]; };
+      ctx.beginPath();
+      var p;
+      p = P(0.42, 0.0); ctx.moveTo(p[0], p[1]);
+      ctx.bezierCurveTo.apply(ctx, P(0.36,0.01).concat(P(0.34,0.03)).concat(P(0.34,0.045)));
+      ctx.bezierCurveTo.apply(ctx, P(0.2,0.06).concat(P(0.1,0.08)).concat(P(0.06,0.14)));
+      ctx.bezierCurveTo.apply(ctx, P(0.02,0.22).concat(P(0.03,0.32)).concat(P(0.07,0.4)));
+      ctx.bezierCurveTo.apply(ctx, P(0.09,0.44).concat(P(0.12,0.46)).concat(P(0.15,0.44)));
+      ctx.bezierCurveTo.apply(ctx, P(0.18,0.4).concat(P(0.2,0.32)).concat(P(0.24,0.27)));
+      ctx.bezierCurveTo.apply(ctx, P(0.22,0.34).concat(P(0.21,0.42)).concat(P(0.24,0.5)));
+      ctx.bezierCurveTo.apply(ctx, P(0.27,0.58).concat(P(0.32,0.62)).concat(P(0.3,0.7)));
+      ctx.bezierCurveTo.apply(ctx, P(0.28,0.8).concat(P(0.27,0.9)).concat(P(0.26,1.0)));
+      p = P(0.42, 1.0); ctx.lineTo(p[0], p[1]);
+      ctx.bezierCurveTo.apply(ctx, P(0.41,0.88).concat(P(0.41,0.78)).concat(P(0.44,0.7)));
+      ctx.bezierCurveTo.apply(ctx, P(0.46,0.64).concat(P(0.46,0.6)).concat(P(0.44,0.55)));
+      p = P(0.5, 0.52); ctx.lineTo(p[0], p[1]);
+      ctx.bezierCurveTo.apply(ctx, P(0.54,0.6).concat(P(0.54,0.64)).concat(P(0.56,0.7)));
+      ctx.bezierCurveTo.apply(ctx, P(0.59,0.78).concat(P(0.59,0.88)).concat(P(0.58,1.0)));
+      p = P(0.74, 1.0); ctx.lineTo(p[0], p[1]);
+      ctx.bezierCurveTo.apply(ctx, P(0.73,0.9).concat(P(0.72,0.8)).concat(P(0.7,0.7)));
+      ctx.bezierCurveTo.apply(ctx, P(0.68,0.62).concat(P(0.73,0.58)).concat(P(0.76,0.5)));
+      ctx.bezierCurveTo.apply(ctx, P(0.79,0.42).concat(P(0.78,0.34)).concat(P(0.76,0.27)));
+      ctx.bezierCurveTo.apply(ctx, P(0.8,0.32).concat(P(0.82,0.4)).concat(P(0.85,0.44)));
+      ctx.bezierCurveTo.apply(ctx, P(0.88,0.46).concat(P(0.91,0.44)).concat(P(0.93,0.4)));
+      ctx.bezierCurveTo.apply(ctx, P(0.97,0.32).concat(P(0.98,0.22)).concat(P(0.94,0.14)));
+      ctx.bezierCurveTo.apply(ctx, P(0.9,0.08).concat(P(0.8,0.06)).concat(P(0.66,0.045)));
+      ctx.bezierCurveTo.apply(ctx, P(0.66,0.03).concat(P(0.64,0.01)).concat(P(0.58,0.0)));
+      ctx.bezierCurveTo.apply(ctx, P(0.53,0.015).concat(P(0.47,0.015)).concat(P(0.42,0.0)));
+      ctx.closePath();
+    }
+
+    function drawGarment(){
+      var rect = gcanvas.getBoundingClientRect();
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      gcanvas.width = rect.width * dpr;
+      gcanvas.height = rect.height * dpr;
+      gctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var w = rect.width, h = rect.height;
+      gctx.clearRect(0, 0, w, h);
+
+      var gh = h * 0.78;
+      var gw = gh * 0.62;
+      var ox = w / 2 - gw / 2;
+      var oy = h * 0.11;
+
+      gctx.save();
+      silhouettePath(gctx, ox, oy, gw);
+      gctx.clip();
+      gctx.fillStyle = inkColorG();
+      gctx.fillRect(ox - 4, oy - 4, gw + 8, gh + 8);
+
+      /* implied lateral light — confined to the silhouette via clip, monochrome only */
+      var grad = gctx.createLinearGradient(ox, 0, ox + gw * 0.55, 0);
+      grad.addColorStop(0, hexToRgba(paperColor(), 0.16));
+      grad.addColorStop(1, hexToRgba(paperColor(), 0));
+      gctx.fillStyle = grad;
+      gctx.fillRect(ox - 4, oy - 4, gw + 8, gh + 8);
+      gctx.restore();
+    }
+
+    function hexToRgba(hex, a){
+      hex = hex.replace('#','');
+      if (hex.length === 3) hex = hex.split('').map(function(c){return c+c;}).join('');
+      var r = parseInt(hex.substring(0,2),16), g = parseInt(hex.substring(2,4),16), b = parseInt(hex.substring(4,6),16);
+      return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+    }
+
+    drawGarment();
+    window.addEventListener('resize', drawGarment);
+    var gmq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (gmq.addEventListener) gmq.addEventListener('change', drawGarment);
+    var gThemeObserver = new MutationObserver(drawGarment);
+    gThemeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   }
 
   /* ---- texture canvas: stitch / thread-tension pattern, one ink only ---- */
